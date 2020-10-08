@@ -25,8 +25,8 @@ async def test(ctx):
     await ctx.send('test passed!')
 
 
-@bot.command(name='this')
-async def this(ctx):
+@bot.command(name='kekthis')
+async def kekthis(ctx):
     link_to_picture = ctx.content[6::]
     message_to_chat = kekfunc.handle_request(link_to_picture)
     await ctx.send(message_to_chat)
