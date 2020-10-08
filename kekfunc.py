@@ -2,7 +2,8 @@ import urllib.request
 from PIL import Image
 import numpy as np
 
-ASCII_CHARS = "⠿⠽⠛⠮⠭⠗⠕⠚⠇⠃⠌⠁⠂⠄"
+ASCII_CHARS_pos = "⠿⠽⠛⠮⠭⠗⠕⠚⠇⠃⠌⠁⠂⠄"
+ASCII_CHARS_neg = "⠄⠂⠁⠌⠃⠇⠚⠕⠗⠭⠮⠛⠽⠿"
 
 
 def build_pixel_matrix(image):
@@ -35,29 +36,51 @@ def build_pixel_matrix(image):
     return pixel_matrix
 
 
-def convert_to_ascii(pixel_matrix):
+def convert_to_ascii_pos(pixel_matrix):
     # We map the luminance of each pixel in the matrix to the corresponding ascii
     ascii_matrix = []
     for row in pixel_matrix:
         ascii_row = []
 
         for pixel in row:
-            ascii_row.append(ASCII_CHARS[int((len(ASCII_CHARS) - 1) * (pixel / 255))])
+            ascii_row.append(ASCII_CHARS_pos[int((len(ASCII_CHARS_pos) - 1) * (pixel / 255))])
 
         ascii_matrix.append(ascii_row)
 
     return ascii_matrix
 
 
-def handle_request(image_link):
+def convert_to_ascii_neg(pixel_matrix):
+    # We map the luminance of each pixel in the matrix to the corresponding ascii
+    ascii_matrix = []
+    for row in pixel_matrix:
+        ascii_row = []
+
+        for pixel in row:
+            ascii_row.append(ASCII_CHARS_neg[int((len(ASCII_CHARS_neg) - 1) * (pixel / 255))])
+
+        ascii_matrix.append(ascii_row)
+
+    return ascii_matrix
+
+
+def handle_request(command_and_link):
     try:
+        requested_command = command_and_link[0:9]
+        image_link = command_and_link[9::]
         req = urllib.request.Request(image_link, headers={'User-Agent': 'Mozilla/5.0'})
         image = Image.open(urllib.request.urlopen(req))
         pixel_matrix = build_pixel_matrix(image)
-        ascii_matrix = convert_to_ascii(pixel_matrix)
+        # positive gradient
+        if requested_command == '!kekthis ':
+            ascii_matrix = convert_to_ascii_pos(pixel_matrix)
+
+        # negative gradient
+        elif requested_command == '!kekthat ':
+            ascii_matrix = convert_to_ascii_neg(pixel_matrix)
+
         flatten_matrix = [pixel for row in ascii_matrix for pixel in row]
+        return "".join(flatten_matrix)
 
     except Exception:
         raise SystemExit(f"The url does not refer to a picture!")
-
-    return "".join(flatten_matrix)

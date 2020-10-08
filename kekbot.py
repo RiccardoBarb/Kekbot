@@ -27,10 +27,15 @@ async def test(ctx):
 
 @bot.command(name='kekthis')
 async def kekthis(ctx):
-    link_to_picture = ctx.content[6::]
-    message_to_chat = kekfunc.handle_request(link_to_picture)
+    command_and_link = ctx.content
+    message_to_chat = kekfunc.handle_request(command_and_link)
     await ctx.send(message_to_chat)
 
+@bot.command(name='kekthat')
+async def kekthis(ctx):
+    command_and_link = ctx.content
+    message_to_chat = kekfunc.handle_request(command_and_link)
+    await ctx.send(message_to_chat)
 
 if __name__ == "__main__":
     bot.run()
