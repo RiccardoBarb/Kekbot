@@ -2,22 +2,26 @@ import urllib.request
 from PIL import Image
 import numpy as np
 
-ASCII_CHARS_pos = "⠿⠽⠛⠮⠭⠗⠕⠚⠇⠃⠌⠁⠂⠄"
-ASCII_CHARS_neg = "⠄⠂⠁⠌⠃⠇⠚⠕⠗⠭⠮⠛⠽⠿"
+# unicode values of each dot in the 2X4 matrix for braille encoding
+# (https://github.com/asciimoo/drawille/blob/master/drawille.py)
+pixel_map = np.array([[0x01, 0x08], [0x02, 0x10], [0x04, 0x20], [0x40, 0x80]])
+
+# braille unicode characters starts at 0x2800
+braille_char_offset = 0x2800
 
 
-def build_pixel_matrix(image):
+def build_pixel_matrix(img):
     # convert in luminance channel (grayscale)
-    image = image.convert('L')
-    # we have to hard code the size of the image, otherwise it won't properly display on twitch chat
-    # an alternative could be int(image.size[0] / image.size[1] * MAX_WIDTH) to maintain the aspect ratio, but it won't
-    # work in most cases
-    new_width = 35
-    new_height = 14
-    image = image.resize((new_width, new_height), Image.ANTIALIAS)  # We resize the image
+    img = img.convert('L')
+    # We have to hard code the size of the image, otherwise it won't properly display on twitch chat.
+    # The length of a line is 35 and the character limit is 500.
+    # We also multiply the width by 2 and the height by 4, as 2X4 is the shape of the grid used for braille conversion.
+    new_width = 35 * 2
+    new_height = 14 * 4
+    img = img.resize((new_width, new_height), Image.ANTIALIAS)  # We resize the image
 
     # Build pixel matrix by luminance values
-    original_pixel_matrix = [[image.getpixel((x, y)) for x in range(image.width)] for y in range(image.height)]
+    original_pixel_matrix = [[img.getpixel((x, y)) for x in range(img.width)] for y in range(img.height)]
 
     # Treat the pixel matrix as a numpy array so we can apply contrast enhancement
     npixel_matrix = np.array(original_pixel_matrix)
@@ -26,7 +30,7 @@ def build_pixel_matrix(image):
     min_pix = np.min(npixel_matrix)
     max_pix = np.max(npixel_matrix)
 
-    # Make a Look-Up Table to translate image values
+    # Make a Look-Up Table to translate image values and enhance contrast TODO: find a  way to perform this with PIL
     lut = np.zeros(256, dtype=np.uint8)
     lut[min_pix:max_pix + 1] = np.linspace(start=0, stop=255, num=(max_pix - min_pix) + 1, endpoint=True,
                                            dtype=np.uint8)
@@ -36,32 +40,31 @@ def build_pixel_matrix(image):
     return pixel_matrix
 
 
-def convert_to_ascii_pos(pixel_matrix):
-    # We map the luminance of each pixel in the matrix to the corresponding ascii
-    ascii_matrix = []
-    for row in pixel_matrix:
-        ascii_row = []
+def convert_to_braille(pixel_matrix, threshold, mode):
+    height = np.shape(pixel_matrix)[0]
+    width = np.shape(pixel_matrix)[1]
+    step_size_x = 2
+    step_size_y = 4
+    converted_mat = []
+    # this is where the conversion happens. We use a 2X4 pixels window to map a combination of 8 pixels to the
+    # corresponding braille character
+    for pix_y in range(0, height, step_size_y):
+        for pix_x in range(0, width, step_size_x):
 
-        for pixel in row:
-            ascii_row.append(ASCII_CHARS_pos[int((len(ASCII_CHARS_pos) - 1) * (pixel / 255))])
+            current_window = pixel_matrix[pix_y:pix_y + step_size_y, pix_x:pix_x + step_size_x]
+            if mode == 'pos':
+                index_to_map = np.argwhere(current_window > threshold)
+            elif mode == 'neg':
+                index_to_map = np.argwhere(current_window < threshold)
 
-        ascii_matrix.append(ascii_row)
+            char_value = np.zeros(8)
+            id_val = 0
+            for row in index_to_map:
+                char_value[id_val] = pixel_map[row[0], row[1]]
+                id_val += 1
+            converted_mat.append(chr(braille_char_offset + int(char_value.sum())))
 
-    return ascii_matrix
-
-
-def convert_to_ascii_neg(pixel_matrix):
-    # We map the luminance of each pixel in the matrix to the corresponding ascii
-    ascii_matrix = []
-    for row in pixel_matrix:
-        ascii_row = []
-
-        for pixel in row:
-            ascii_row.append(ASCII_CHARS_neg[int((len(ASCII_CHARS_neg) - 1) * (pixel / 255))])
-
-        ascii_matrix.append(ascii_row)
-
-    return ascii_matrix
+    return converted_mat
 
 
 def handle_request(command_and_link):
@@ -73,14 +76,13 @@ def handle_request(command_and_link):
         pixel_matrix = build_pixel_matrix(image)
         # positive gradient
         if requested_command == '!kekthis ':
-            ascii_matrix = convert_to_ascii_pos(pixel_matrix)
+            braille_matrix = convert_to_braille(pixel_matrix, threshold=120, mode='pos')
 
         # negative gradient
         elif requested_command == '!kekthat ':
-            ascii_matrix = convert_to_ascii_neg(pixel_matrix)
+            braille_matrix = convert_to_braille(pixel_matrix, threshold=120, mode='neg')
 
-        flatten_matrix = [pixel for row in ascii_matrix for pixel in row]
-        return "".join(flatten_matrix)
+        return "".join(braille_matrix)
 
     except Exception:
         raise SystemExit(f"The url does not refer to a picture!")
