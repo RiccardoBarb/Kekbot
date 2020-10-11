@@ -1,7 +1,9 @@
 import urllib.request
 from PIL import Image
 import numpy as np
-
+from PIL import ImageEnhance
+import matplotlib
+from matplotlib import pyplot as plt
 # unicode values of each dot in the 2X4 matrix for braille encoding
 # (https://github.com/asciimoo/drawille/blob/master/drawille.py)
 pixel_map = np.array([[0x01, 0x08], [0x02, 0x10], [0x04, 0x20], [0x40, 0x80]])
@@ -18,26 +20,19 @@ def build_pixel_matrix(img):
     # We also multiply the width by 2 and the height by 4, as 2X4 is the shape of the grid used for braille conversion.
     new_width = 35 * 2
     new_height = 14 * 4
+    plt.figure()
     img = img.resize((new_width, new_height), Image.ANTIALIAS)  # We resize the image
+    # after several tests this seems to be the best enhancement for most of twitch emotes
+    enhancer_sharp = ImageEnhance.Sharpness(img)
+    img2 = enhancer_sharp.enhance(10)
+
 
     # Build pixel matrix by luminance values
-    original_pixel_matrix = [[img.getpixel((x, y)) for x in range(img.width)] for y in range(img.height)]
+    enhanced_pixel_matrix = [[img2.getpixel((x, y)) for x in range(img.width)] for y in range(img.height)]
+    # Treat the pixel matrix as a numpy array so we can easily appy trasformations to braille
+    npixel_matrix = np.array(enhanced_pixel_matrix)
 
-    # Treat the pixel matrix as a numpy array so we can apply contrast enhancement
-    npixel_matrix = np.array(original_pixel_matrix)
-
-    # Get brightness range
-    min_pix = np.min(npixel_matrix)
-    max_pix = np.max(npixel_matrix)
-
-    # Make a Look-Up Table to translate image values and enhance contrast TODO: find a  way to perform this with PIL
-    lut = np.zeros(256, dtype=np.uint8)
-    lut[min_pix:max_pix + 1] = np.linspace(start=0, stop=255, num=(max_pix - min_pix) + 1, endpoint=True,
-                                           dtype=np.uint8)
-
-    pixel_matrix = lut[npixel_matrix]
-
-    return pixel_matrix
+    return npixel_matrix
 
 
 def convert_to_braille(pixel_matrix, threshold, mode):
@@ -85,4 +80,4 @@ def handle_request(command_and_link):
         return "".join(braille_matrix)
 
     except Exception:
-        raise SystemExit(f"The url does not refer to a picture!")
+        return "".join("MrDestructoid Something went wrong MrDestructoid, I cannot process that link")

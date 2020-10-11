@@ -8,7 +8,7 @@ bot = commands.Bot(
     client_id=os.environ['CLIENT_ID'],
     nick=os.environ['BOT_NICK'],
     prefix=os.environ['BOT_PREFIX'],
-    initial_channels =[os.environ['CHANNEL']]
+    initial_channels=[os.environ['CHANNEL']]
 )
 
 
@@ -31,11 +31,13 @@ async def kekthis(ctx):
     message_to_chat = kekfunc.handle_request(command_and_link)
     await ctx.send(message_to_chat)
 
+
 @bot.command(name='kekthat')
 async def kekthis(ctx):
     command_and_link = ctx.content
     message_to_chat = kekfunc.handle_request(command_and_link)
     await ctx.send(message_to_chat)
+
 
 if __name__ == "__main__":
     bot.run()
