@@ -1,8 +1,7 @@
 import urllib.request
 from PIL import Image
 import numpy as np
-from PIL import ImageEnhance
-import matplotlib
+from PIL import ImageOps
 from matplotlib import pyplot as plt
 # unicode values of each dot in the 2X4 matrix for braille encoding
 # (https://github.com/asciimoo/drawille/blob/master/drawille.py)
@@ -23,12 +22,11 @@ def build_pixel_matrix(img):
     plt.figure()
     img = img.resize((new_width, new_height), Image.ANTIALIAS)  # We resize the image
     # after several tests this seems to be the best enhancement for most of twitch emotes
-    enhancer_sharp = ImageEnhance.Sharpness(img)
-    img2 = enhancer_sharp.enhance(10)
+    img=ImageOps.autocontrast(img, cutoff=0.1)
 
 
     # Build pixel matrix by luminance values
-    enhanced_pixel_matrix = [[img2.getpixel((x, y)) for x in range(img.width)] for y in range(img.height)]
+    enhanced_pixel_matrix = [[img.getpixel((x, y)) for x in range(img.width)] for y in range(img.height)]
     # Treat the pixel matrix as a numpy array so we can easily appy trasformations to braille
     npixel_matrix = np.array(enhanced_pixel_matrix)
 
@@ -71,11 +69,11 @@ def handle_request(command_and_link):
         pixel_matrix = build_pixel_matrix(image)
         # positive gradient
         if requested_command == '!kekthis ':
-            braille_matrix = convert_to_braille(pixel_matrix, threshold=120, mode='pos')
+            braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='pos')
 
         # negative gradient
         elif requested_command == '!kekthat ':
-            braille_matrix = convert_to_braille(pixel_matrix, threshold=120, mode='neg')
+            braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='neg')
 
         return "".join(braille_matrix)
 
