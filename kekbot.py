@@ -17,13 +17,18 @@ async def event_ready():
     'Called once when the bot goes online.'
     print(f"{os.environ['BOT_NICK']} is online!")
     ws = bot._ws  # this is only needed to send messages within event_ready
-    await ws.send_privmsg(os.environ['CHANNEL'], f"/me has landed!")
+    await ws.send_privmsg(os.environ['CHANNEL'], f"/me is online!")
 
 
-@bot.command(name='test')
+@bot.command(name='kekwho')
 async def test(ctx):
-    await ctx.send('test passed!')
+    await ctx.send('Hello there :) I am Kekbot. I transform Twitch emotes into shitty braille art. '
+                   'Type !kekhow to learn how to use me')
 
+@bot.command(name='kekhow')
+async def test(ctx):
+    await ctx.send('Type !kekthis or !kekthat followed by the link to an emote picture. Sometimes '
+                   'it works and sometimes it sucks but I always try my best B)')
 
 @bot.command(name='kekthis')
 async def kekthis(ctx):

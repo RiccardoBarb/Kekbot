@@ -1,7 +1,7 @@
 import urllib.request
-from PIL import Image
+from PIL import Image, ImageOps, ImageFilter
 import numpy as np
-from PIL import ImageOps
+
 from matplotlib import pyplot as plt
 # unicode values of each dot in the 2X4 matrix for braille encoding
 # (https://github.com/asciimoo/drawille/blob/master/drawille.py)
@@ -12,22 +12,28 @@ braille_char_offset = 0x2800
 
 
 def build_pixel_matrix(img):
-    # convert in luminance channel (grayscale)
-    img = img.convert('L')
+    # convert in luminance and alpha channels (grayscale with preserved background from certain png)
+    img = img.convert('LA')
     # We have to hard code the size of the image, otherwise it won't properly display on twitch chat.
     # The length of a line is 35 and the character limit is 500.
     # We also multiply the width by 2 and the height by 4, as 2X4 is the shape of the grid used for braille conversion.
     new_width = 35 * 2
     new_height = 14 * 4
-    plt.figure()
     img = img.resize((new_width, new_height), Image.ANTIALIAS)  # We resize the image
-    # after several tests this seems to be the best enhancement for most of twitch emotes
-    img=ImageOps.autocontrast(img, cutoff=0.1)
-
-
-    # Build pixel matrix by luminance values
+    # After several tests this seems to be the best set of enhancement for most of twitch emotes: first
+    # we get rid of the alpha channel, this often leave some noise which we remove with a median filter.
+    # Finally we enhance the contrast and sharpness of the filtered image
+    img = img.convert('L')
+    median_filter = ImageFilter.MedianFilter(3)
+    sharpness_filter = ImageFilter.EDGE_ENHANCE_MORE()
+    img = img.filter(median_filter)
+    img = img.filter(sharpness_filter)
+    # we apply an extra set of median flters because the sharpening sometimes results in extra noise
+    img = img.filter(median_filter)
+    img = ImageOps.autocontrast(img, cutoff=0.2)
+    # Build pixel matrix with luminance values
     enhanced_pixel_matrix = [[img.getpixel((x, y)) for x in range(img.width)] for y in range(img.height)]
-    # Treat the pixel matrix as a numpy array so we can easily appy trasformations to braille
+    # Treat the pixel matrix as a numpy array so we can easily apply transformations to braille
     npixel_matrix = np.array(enhanced_pixel_matrix)
 
     return npixel_matrix
