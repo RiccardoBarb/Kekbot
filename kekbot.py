@@ -23,11 +23,11 @@ async def event_ready():
 @bot.command(name='kekwho')
 async def test(ctx):
     await ctx.send('Hello there :) I am Kekbot. I transform Twitch emotes into shitty braille art. '
-                   'Type !kekhow to learn how to use me')
+                   'Type !kekhow and learn how to use me')
 
 @bot.command(name='kekhow')
 async def test(ctx):
-    await ctx.send('Type !kekthis or !kekthat followed by the link to an emote picture. Sometimes '
+    await ctx.send('Type !kekthis or !kekthat followed by the link to an emote. Sometimes '
                    'it works and sometimes it sucks but I always try my best B)')
 
 @bot.command(name='kekthis')
