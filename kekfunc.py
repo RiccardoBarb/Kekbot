@@ -21,16 +21,26 @@ def build_pixel_matrix(img):
     new_height = 14 * 4
     img = img.resize((new_width, new_height), Image.ANTIALIAS)  # We resize the image
     # After several tests this seems to be the best set of enhancement for most of twitch emotes: first
-    # we get rid of the alpha channel, this often leave some noise which we remove with a median filter.
-    # Finally we enhance the contrast and sharpness of the filtered image
+    # we get rid of the alpha channel, and compress the details of the image by applying posterization.
+    # We also equalize the image to better visualize dark pictures.
+    # This procedures might leave some noise which we remove with a median filter.
+    # Finally we enhance the edge and sharpness of the filtered image, apply some smoothing and enhance the details.
+    # The result is not always perfect but it works for most twitch and BTTV emotes at the current resolution.
     img = img.convert('L')
+    img = ImageOps.posterize(img, bits=6)
+    img = ImageOps.equalize(img)
+    # prepare filters
     median_filter = ImageFilter.MedianFilter(3)
-    sharpness_filter = ImageFilter.EDGE_ENHANCE_MORE()
+    edge_enhance = ImageFilter.EDGE_ENHANCE_MORE()
+    sharpness_filter = ImageFilter.SHARPEN()
+    smooth_filter = ImageFilter.SMOOTH()
+    detail_filter = ImageFilter.DETAIL()
+    # apply filters
     img = img.filter(median_filter)
+    img = img.filter(edge_enhance)
+    img = img.filter(smooth_filter)
     img = img.filter(sharpness_filter)
-    # we apply an extra set of median flters because the sharpening sometimes results in extra noise
-    img = img.filter(median_filter)
-    img = ImageOps.autocontrast(img, cutoff=0.2)
+    img = img.filter(detail_filter)
     # Build pixel matrix with luminance values
     enhanced_pixel_matrix = [[img.getpixel((x, y)) for x in range(img.width)] for y in range(img.height)]
     # Treat the pixel matrix as a numpy array so we can easily apply transformations to braille
