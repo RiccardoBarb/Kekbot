@@ -1,0 +1,8 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: osx-64
+numpy=1.19.1=py37h1efc2f6_2
+pillow=7.1.2=py37hfd78ece_0
+python=3.7.8=hc9dea61_1_cpython
+twitchio=1.1.0=pypi_0
+urllib3=1.25.10=py_0
