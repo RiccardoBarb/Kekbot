@@ -27,8 +27,9 @@ async def test(ctx):
 
 @bot.command(name='kekhow')
 async def test(ctx):
-    await ctx.send('Type !kekthis or !kekthat followed by the link to an emote. Sometimes '
-                   'it works and sometimes it sucks but I always try my best B)')
+    await ctx.send('Type !kekthis or !kekthat followed by the url of an emote. Sometimes '
+                   'it works and sometimes it sucks but I always try my best B). If you want to know more check'
+                   'this out https://github.com/RiccardoBarb/Kekbot')
 
 @bot.command(name='kekthis')
 async def kekthis(ctx):
