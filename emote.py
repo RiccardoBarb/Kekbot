@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from urllib.parse import urlparse
 import urllib.request
 import json
@@ -51,3 +52,14 @@ class Emote:
             if code not in emotes_list:
                 ids = emote['id']
                 emotes_list[code] = ids
+
+    def save_emotes(self):
+        wd = os.getcwd()
+        today = str(datetime.today().date())
+        data_dir = wd + 'data'
+
+        if not os.path.exists(data_dir):
+            os.mkdir(data_dir)
+
+        with open(data_dir + 'emote_list' + today + '.json', 'w') as fp:
+            json.dump(self.emotes_list, fp)
