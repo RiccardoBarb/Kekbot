@@ -1,11 +1,23 @@
 import os
 from datetime import datetime
+from time import perf_counter
 from urllib.parse import urlparse
 import urllib.request
 import json
 
 
 class Emote:
+
+    # The Emote class is used to retrieve the requested emote through BTTV and Twitchemotes API.
+    # It is initialized with 3 variables:
+    #
+    # reference - an empty string which should either contain a direct url to the emote/image or the corresponding
+    #   Twitch/BTTV command. N.B. it should only contain 1 string (e.g either 'Kappa' or 'KEKW', not both) ;
+    # identity - a dictionary with the bot token and the client ID. Not used for now but it can be useful to directly
+    #   access Twitch API (for example for getting channel-specific emotes using the corresponding command e.g.
+    #   'damide1Hi');
+    # emote_list - an empty dictionary. The methods get_bttv_emotes and get_twitch_emotes fill the dictionary with
+    #   emotes commands as keys and their corresponding ID as values.
 
     def __init__(self):
         self.reference = ''
@@ -56,10 +68,41 @@ class Emote:
     def save_emotes(self):
         wd = os.getcwd()
         today = str(datetime.today().date())
-        data_dir = wd + 'data'
+        data_dir = wd + '/data'
 
         if not os.path.exists(data_dir):
             os.mkdir(data_dir)
 
-        with open(data_dir + 'emote_list' + today + '.json', 'w') as fp:
+        with open(data_dir + '/emote_list_' + today + '.json', 'w') as fp:
             json.dump(self.emotes_list, fp)
+
+        print('saved emote list in' + data_dir)
+
+    def load_recent_emotes(self):
+        try:
+            wd = os.getcwd()
+            data_dir = wd + '/data'
+
+            if not os.path.exists(data_dir):
+                raise NotADirectoryError
+
+            elif not any([i for i in os.listdir(data_dir) if i.endswith('.json')]):
+                raise FileNotFoundError
+
+            data_list = [data_dir + '/' + i for i in os.listdir(data_dir) if i.endswith('.json')]
+            #TODO: why doesn't this work?
+            #sorted_data_list = data_list.sort(key=os.path.getctime)
+
+            with open(data_list[0]) as json_file:
+                self.emotes_list = json.load(json_file)
+
+            print('Data loaded successfully!')
+
+        except (NotADirectoryError, FileNotFoundError):
+            print('Data not found\nDownloading new data\n')
+            start = perf_counter()
+            print('Start download from Twitch and BTTV')
+            self.get_twitch_emotes()
+            [self.get_bttv_emotes(i * 100, 100) for i in range(10)]
+            stop = perf_counter()
+            print('Done! Elapsed time:' + str(round(stop - start)) + 's')
