@@ -31,7 +31,7 @@ async def test(ctx):
 
 @bot.command(name='kekhow')
 async def test(ctx):
-    await ctx.send('Use a message highlight to type !kekthis or !kekthat followed by the url of an emote.'
+    await ctx.send('Redeem the reward, then type !kekthis or !kekthat followed by the emote or the emote link.'
                    ' Look here for an example: https://github.com/RiccardoBarb/Kekbot')
 
 

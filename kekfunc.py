@@ -97,4 +97,4 @@ def handle_request(command_and_link):
         return "".join(braille_matrix)
 
     except Exception:
-        return "".join("MrDestructoid Something went wrong MrDestructoid, I cannot process that link")
+        return "".join("MrDestructoid Something went wrong MrDestructoid, cannot process that")
