@@ -34,6 +34,9 @@ class Emote:
 
     def get_bttv_emotes(self, offset, limit):
 
+        """offset and limit are integers. offset sets the starting emote in the list, limit should be max 100
+        (max number of emotes per page)"""
+
         emotes_list = self.emotes_list
         url = 'https://api.betterttv.net/3/emotes/shared/top?offset=' + str(offset) + '&limit=' + str(limit)
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -49,10 +52,12 @@ class Emote:
                 ids = emote['id']
                 emotes_list[code] = ids
 
-    def get_twitch_emotes(self):
+    def get_twitch_emotes(self, set_number):
+
+        """set_number needs to be a an integer between 0 and 5 for standard emotes"""
 
         emotes_list = self.emotes_list
-        url = 'https://api.twitchemotes.com/api/v4/channels/0'
+        url = 'https://api.twitchemotes.com/api/v4/channels/' + str(set_number)
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         url_content = urllib.request.urlopen(req)
         url_data = url_content.read()
@@ -102,8 +107,8 @@ class Emote:
             print('Data not found\nDownloading new data\n')
             start = perf_counter()
             print('Start download from Twitch and BTTV')
-            self.get_twitch_emotes()
-            [self.get_bttv_emotes(i * 100, 100) for i in range(10)]
+            [self.get_twitch_emotes(i) for i in range(6)]
+            [self.get_bttv_emotes(i * 100, 100) for i in range(11)]
             stop = perf_counter()
             print('Done! Elapsed time:' + str(round(stop - start)) + 's')
 
