@@ -1,9 +1,10 @@
 import os
 from twitchio.ext import commands
 import kekfunc
+import emote
 
+# set up the bot
 bot = commands.Bot(
-    # set up the bot
     irc_token=os.environ['TMI_TOKEN'],
     client_id=os.environ['CLIENT_ID'],
     nick=os.environ['BOT_NICK'],
@@ -11,13 +12,15 @@ bot = commands.Bot(
     initial_channels=[os.environ['CHANNEL']]
 )
 
+is_test = True
+# initialize emote and load emote list
+e = emote.Emote()
+e.load_recent_emotes()
 
 @bot.event
 async def event_ready():
-    'Called once when the bot goes online.'
+    # Called once when the bot goes online'
     print(f"{os.environ['BOT_NICK']} is online!")
-    # ws = bot._ws  # this is only needed to send messages within event_ready
-    # await ws.send_privmsg(os.environ['CHANNEL'], f"/me is online!")
 
 
 @bot.command(name='kekwho')
@@ -34,22 +37,32 @@ async def test(ctx):
 
 @bot.command(name='kekthis')
 async def kekthis(ctx):
-    if 'msg-id' in ctx.message.tags and ctx.message.tags['msg-id'] == 'highlighted-message':
+    if is_test:
         command_and_link = ctx.content
         message_to_chat = kekfunc.handle_request(command_and_link)
         await ctx.send(message_to_chat)
     else:
-        pass
+        if 'msg-id' in ctx.message.tags and ctx.message.tags['msg-id'] == 'highlighted-message':
+            command_and_link = ctx.content
+            message_to_chat = kekfunc.handle_request(command_and_link)
+            await ctx.send(message_to_chat)
+        else:
+            pass
 
 
 @bot.command(name='kekthat')
-async def kekthis(ctx):
-    if 'msg-id' in ctx.message.tags and ctx.message.tags['msg-id'] == 'highlighted-message':
+async def kekthat(ctx):
+    if is_test:
         command_and_link = ctx.content
         message_to_chat = kekfunc.handle_request(command_and_link)
         await ctx.send(message_to_chat)
     else:
-        pass
+        if 'msg-id' in ctx.message.tags and ctx.message.tags['msg-id'] == 'highlighted-message':
+            command_and_link = ctx.content
+            message_to_chat = kekfunc.handle_request(command_and_link)
+            await ctx.send(message_to_chat)
+        else:
+            pass
 
 
 @bot.command(name='test')

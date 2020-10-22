@@ -1,6 +1,7 @@
 import urllib.request
 from PIL import Image, ImageOps, ImageFilter
 import numpy as np
+from kekbot import e
 
 from matplotlib import pyplot as plt
 # unicode values of each dot in the 2X4 matrix for braille encoding
@@ -79,7 +80,9 @@ def convert_to_braille(pixel_matrix, threshold, mode):
 def handle_request(command_and_link):
     try:
         requested_command = command_and_link[0:9]
-        image_link = command_and_link[9::]
+        image_reference = command_and_link[9::]
+        e.reference = image_reference
+        image_link = e.retrieve_emote()
         req = urllib.request.Request(image_link, headers={'User-Agent': 'Mozilla/5.0'})
         image = Image.open(urllib.request.urlopen(req))
         pixel_matrix = build_pixel_matrix(image)
