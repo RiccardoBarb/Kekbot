@@ -24,8 +24,9 @@ class Emote:
         self.identity = {'token': os.environ['TMI_TOKEN'], 'ID': os.environ['CLIENT_ID']}
         self.emotes_list = {}
 
-    def has_url(self):
-        reference = urlparse(self.reference)
+    @staticmethod
+    def is_url(string):
+        reference = urlparse(string)
         if not (reference.scheme and reference.netloc):
             return False
         else:
@@ -90,10 +91,9 @@ class Emote:
                 raise FileNotFoundError
 
             data_list = [data_dir + '/' + i for i in os.listdir(data_dir) if i.endswith('.json')]
-            #TODO: why doesn't this work?
-            #sorted_data_list = data_list.sort(key=os.path.getctime)
+            sorted_data_list = sorted(data_list, reverse=True)
 
-            with open(data_list[0]) as json_file:
+            with open(sorted_data_list[0]) as json_file:
                 self.emotes_list = json.load(json_file)
 
             print('Data loaded successfully!')
@@ -106,3 +106,31 @@ class Emote:
             [self.get_bttv_emotes(i * 100, 100) for i in range(10)]
             stop = perf_counter()
             print('Done! Elapsed time:' + str(round(stop - start)) + 's')
+
+    def retrieve_emote(self):
+        if Emote.is_url(self.reference):
+            final_url = self.reference
+        else:
+            twitch_url_a = 'https://static-cdn.jtvnw.net/emoticons/v2/'
+            twitch_url_b = '/default/dark/2.0'
+            bttv_url_a = 'https://cdn.betterttv.net/emote/'
+            bttv_url_b = '/2x'
+
+            if self.reference in self.emotes_list:
+                test_twitch_url = twitch_url_a + str(self.emotes_list[self.reference]) + twitch_url_b
+                test_bttv_url = bttv_url_a + str(self.emotes_list[self.reference]) + bttv_url_b
+                final_url = 'NotFound'
+                try:
+                    test = urllib.request.urlopen(test_twitch_url)
+                    final_url = test_twitch_url
+
+                except urllib.error.HTTPError:
+                    test = urllib.request.urlopen(test_bttv_url)
+                    final_url = test_bttv_url
+
+                finally:
+                    return final_url
+            else:
+                final_url = 'UnknownEmote'
+
+        return final_url
