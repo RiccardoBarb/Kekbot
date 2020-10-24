@@ -8,8 +8,8 @@ Kekbot knows the most common Twitch and BTTV emotes. It can access to the emote 
 With this method you can spam the braille version of more than 8000 different emotes! However not all of the emotes are available (for now).<br/>
 Channel-specific emotes like damide1Hi are not available at the moment. Smiles such as :) :( B) or heart <3 are also not available. However, you can directly use the url of a specific picture with **!kekthis** or **!kekthat**. In this way you can literally transform any picture into braille, PogChamp!<br/>
 * *N.B.1*: The emote names are case sensitive! **!kekthis** poggers will return an error, but **!kekthis** POGGERS will work.<br/>
-* *N.B.3*: Kekbot braille art will not be properly displayed on mobile, or more generally on a not-standard Twitch chat interface. 
-* *N.B.2*: Some of the picture-to-braille transformations sucks (have you tried with BibleThump?). 
+* *N.B.2*: Kekbot braille art will not be properly displayed on mobile, or more generally on a not-standard Twitch chat interface. 
+* *N.B.3*: Some of the picture-to-braille transformations sucks (have you tried with BibleThump?). 
 
 ### Commands
 
