@@ -18,8 +18,8 @@ class Chat:
             return chat_config
 
     def is_highlight(self):
-        if 'msg-id' in self.twitchio_obj.ctx.message.tags and \
-                self.twitchio_obj.ctx.message.tags['msg-id'] == 'highlighted-message':
+        if 'msg-id' in self.twitchio_obj.message.tags and \
+                self.twitchio_obj.message.tags['msg-id'] == 'highlighted-message':
             return True
         else:
             return False

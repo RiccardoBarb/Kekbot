@@ -35,6 +35,7 @@ async def kekwho(ctx):
 
 @bot.command(name='kekhow')
 async def kekhow(ctx):
+    """TODO: add personalized channel messages"""
     await ctx.send('Redeem the reward, then type !kekthis or !kekthat followed by the emote or the emote link.'
                    ' Look here for an example: https://github.com/RiccardoBarb/Kekbot')
 
