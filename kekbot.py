@@ -42,6 +42,7 @@ async def kekhow(ctx):
 
 @bot.command(name='kekthis')
 async def kekthis(ctx):
+    """TODO: log requested emotes"""
     chat_object.twitchio_obj = ctx
     channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
     if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
