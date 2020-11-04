@@ -8,18 +8,17 @@ import json
 
 class Emote:
 
-    # The Emote class is used to retrieve the requested emote through BTTV and Twitchemotes API.
-    # It is initialized with 3 variables:
-    #
-    # reference - an empty string which should either contain a direct url to the emote/image or the corresponding
-    #   Twitch/BTTV command. N.B. it should only contain 1 string (e.g either 'Kappa' or 'KEKW', not both) ;
-    # identity - a dictionary with the bot token and the client ID. Not used for now but it can be useful to directly
-    #   access Twitch API (for example for getting channel-specific emotes using the corresponding command e.g.
-    #   'damide1Hi');
-    # emote_list - an empty dictionary. The methods get_bttv_emotes and get_twitch_emotes fill the dictionary with
-    #   emotes commands as keys and their corresponding ID as values.
-
     def __init__(self):
+        """ The Emote class is used to retrieve the requested emote through BTTV and Twitchemotes API.
+         It is initialized with 3 variables:
+
+         reference: an empty string which should either contain a direct url to the emote/image or the corresponding
+         Twitch/BTTV command. N.B. it should only contain 1 string (e.g either 'Kappa' or 'KEKW', not both) ;
+         identity: a dictionary with the bot token and the client ID. Not used for now but it can be useful to directly
+         access Twitch API (for example for getting channel-specific emotes using the corresponding command e.g.'damide1Hi');
+         emote_list: an empty dictionary. The methods get_bttv_emotes and get_twitch_emotes fill the dictionary with
+         emotes commands as keys and their corresponding ID as values."""
+
         self.reference = ''
         self.identity = {'token': os.environ['TMI_TOKEN'], 'ID': os.environ['CLIENT_ID']}
         self.emotes_list = {}
