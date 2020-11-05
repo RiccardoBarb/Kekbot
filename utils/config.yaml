@@ -3,4 +3,4 @@ channel_1:
   only_mods: False
 channel_2:
   name: os.environ['CHANNEL_2']
-  only_mods: True
+  only_mods: False

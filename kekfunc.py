@@ -19,7 +19,7 @@ def build_pixel_matrix(img):
     # The length of a line is 35 and the character limit is 500. Line of 30 seems acceptable for multiple screen sizes.
     # We also multiply the width by 2 and the height by 4, as 2X4 is the shape of the grid used for braille conversion.
     new_width = 30 * 2
-    new_height = 16 * 4
+    new_height = 15 * 4
     img = img.resize((new_width, new_height), Image.ANTIALIAS)  # We resize the image
     # After several tests this seems to be the best set of enhancement for most of twitch emotes: first
     # we get rid of the alpha channel, and compress the details of the image by applying posterization.
@@ -89,14 +89,14 @@ def handle_request(command_and_link):
         # positive gradient
         if requested_command == '!kekthis ':
             braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='pos')
-            reshaped_mat = []
+            reshaped_mat = [chr(braille_char_offset)*30]
             for r in range(0, len(braille_matrix), 30):
                 reshaped_mat.append("".join(braille_matrix[r:r + 30]))
 
         # negative gradient
         elif requested_command == '!kekthat ':
             braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='neg')
-            reshaped_mat = []
+            reshaped_mat = [chr(braille_char_offset)*30]
             for r in range(0, len(braille_matrix), 30):
                 reshaped_mat.append("\n".join(braille_matrix[r:r + 30]))
 

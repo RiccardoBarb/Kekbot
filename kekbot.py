@@ -24,7 +24,8 @@ e.load_recent_emotes()
 @bot.event
 async def event_ready():
     """"" Called once when the bot goes online """
-    print(f"{os.environ['BOT_NICK']} is connected to {chat_object.channel_names}")
+    for i in range(len(chat_object.channel_names)):
+        print(f"{os.environ['BOT_NICK']} is connected to {chat_object.channel_names[i]}")
 
 
 @bot.command(name='kekwho')
