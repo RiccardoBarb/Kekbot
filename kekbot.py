@@ -4,6 +4,7 @@ import asyncio
 import kekfunc
 import emote
 import chat
+from datetime import datetime
 
 # GENERAL SETUP
 # load channel config and initialize chat object
@@ -24,12 +25,13 @@ class Bot(commands.Bot):
         self.emotes = emote.Emote()
         self.emotes.load_recent_emotes()
 
-    # DEFINE TASKS
+    # DEFINE CYCLIC TASKS
     async def dump_cache(self):
         while True:
-            await asyncio.sleep(5)
-            # df = chat_object.to_dataframe()
-            print('dumping cache')
+            await asyncio.sleep(120)
+            now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            df = chat_object.dump_to_csv()
+            print('dumping cache', now)
 
     # DEFINE EVENTS
     async def event_ready(self):
@@ -101,6 +103,6 @@ class Bot(commands.Bot):
 
 
 # RUN THE BOT
-# if __name__ == "__main__":
+
 bot = Bot()
 bot.run()
