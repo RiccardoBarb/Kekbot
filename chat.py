@@ -36,7 +36,11 @@ class Chat:
              self.twitchio_obj.channel.name, self.twitchio_obj.timestamp.strftime('%Y-%m-%d %H:%M:%S')])
         return self
 
-    def to_dataframe(self):
+    def dump_to_csv(self):
         """logging basic info using pd dataframe"""
         df = pd.DataFrame(self.log_content, columns=self.log_columns)
-        return df
+        if 'temp_data_log.csv' in os.listdir(os.getcwd()+'/Data'):
+            df.to_csv(os.getcwd()+'/Data/temp_data_log.csv', mode='a', header=False, index=False)
+        else:
+            df.to_csv(os.getcwd()+'/Data/temp_data_log.csv', index=False)
+        self.log_content = []
