@@ -1,7 +1,6 @@
 import urllib.request
 from PIL import Image, ImageOps, ImageFilter
 import numpy as np
-from kekbot import e
 
 from matplotlib import pyplot as plt
 # unicode values of each dot in the 2X4 matrix for braille encoding
@@ -11,6 +10,12 @@ pixel_map = np.array([[0x01, 0x08], [0x02, 0x10], [0x04, 0x20], [0x40, 0x80]])
 # braille unicode characters starts at 0x2800
 braille_char_offset = 0x2800
 
+# sizes
+height = 15
+width = 30
+step_size_x = 2
+step_size_y = 4
+
 
 def build_pixel_matrix(img):
     # convert in luminance and alpha channels (grayscale with preserved background from certain png)
@@ -18,8 +23,8 @@ def build_pixel_matrix(img):
     # We have to hard code the size of the image, otherwise it won't properly display on twitch chat.
     # The length of a line is 35 and the character limit is 500. Line of 30 seems acceptable for multiple screen sizes.
     # We also multiply the width by 2 and the height by 4, as 2X4 is the shape of the grid used for braille conversion.
-    new_width = 30 * 2
-    new_height = 15 * 4
+    new_width = width * step_size_x
+    new_height = height * step_size_y
     img = img.resize((new_width, new_height), Image.ANTIALIAS)  # We resize the image
     # After several tests this seems to be the best set of enhancement for most of twitch emotes: first
     # we get rid of the alpha channel, and compress the details of the image by applying posterization.
@@ -53,8 +58,6 @@ def build_pixel_matrix(img):
 def convert_to_braille(pixel_matrix, threshold, mode):
     height = np.shape(pixel_matrix)[0]
     width = np.shape(pixel_matrix)[1]
-    step_size_x = 2
-    step_size_y = 4
     converted_mat = []
     # this is where the conversion happens. We use a 2X4 pixels window to map a combination of 8 pixels to the
     # corresponding braille character
@@ -77,28 +80,27 @@ def convert_to_braille(pixel_matrix, threshold, mode):
     return converted_mat
 
 
-def handle_request(command_and_link):
+def handle_request(command_and_link, emotes):
     try:
         requested_command = command_and_link[0:9]
         image_reference = command_and_link[9::]
-        e.reference = image_reference
-        image_link = e.retrieve_emote()
+        emotes.reference = image_reference
+        image_link = emotes.retrieve_emote()
         req = urllib.request.Request(image_link, headers={'User-Agent': 'Mozilla/5.0'})
         image = Image.open(urllib.request.urlopen(req))
         pixel_matrix = build_pixel_matrix(image)
+        reshaped_mat = [chr(braille_char_offset) * width]
         # positive gradient
         if requested_command == '!kekthis ':
             braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='pos')
-            reshaped_mat = [chr(braille_char_offset)*30]
-            for r in range(0, len(braille_matrix), 30):
-                reshaped_mat.append("".join(braille_matrix[r:r + 30]))
+            for r in range(0, len(braille_matrix), width):
+                reshaped_mat.append("".join(braille_matrix[r:r + width]))
 
         # negative gradient
         elif requested_command == '!kekthat ':
             braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='neg')
-            reshaped_mat = [chr(braille_char_offset)*30]
-            for r in range(0, len(braille_matrix), 30):
-                reshaped_mat.append("\n".join(braille_matrix[r:r + 30]))
+            for r in range(0, len(braille_matrix), width):
+                reshaped_mat.append("".join(braille_matrix[r:r + width]))
 
         return "\n".join(reshaped_mat)
 
