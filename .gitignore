@@ -1,5 +1,4 @@
 /.idea/
 **/__pychache__
 *.pyc
-/Data/*.csv
 /utils/database/
