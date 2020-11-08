@@ -1,91 +1,108 @@
 import os
 from twitchio.ext import commands
+import asyncio
 import kekfunc
 import emote
 import chat
+from datetime import datetime
 
 # GENERAL SETUP
 # load channel config and initialize chat object
 chat_config = chat.Chat.load_chat_config('utils/config.yaml')
 chat_object = chat.Chat(chat_config)
+
 # set up the bot
-bot = commands.Bot(
-    irc_token=os.environ['TMI_TOKEN'],
-    client_id=os.environ['CLIENT_ID'],
-    nick=os.environ['BOT_NICK'],
-    prefix=os.environ['BOT_PREFIX'],
-    initial_channels=chat_object.channel_names
-)
-# initialize emote and load emote list
-e = emote.Emote()
-e.load_recent_emotes()
+class Bot(commands.Bot):
 
-# DEFINE COMMANDS
-@bot.event
-async def event_ready():
-    """"" Called once when the bot goes online """
-    for i in range(len(chat_object.channel_names)):
-        print(f"{os.environ['BOT_NICK']} is connected to {chat_object.channel_names[i]}")
+    def __init__(self):
+        super().__init__(
+            irc_token=os.environ['TMI_TOKEN'],
+            client_id=os.environ['CLIENT_ID'],
+            nick=os.environ['BOT_NICK'],
+            prefix=os.environ['BOT_PREFIX'],
+            initial_channels=chat_object.channel_names)
+        # initialize emote and load emote list
+        self.emotes = emote.Emote()
+        self.emotes.load_recent_emotes()
 
+    # DEFINE CYCLIC TASKS
+    async def dump_cache(self):
+        while True:
+            await asyncio.sleep(120)
+            now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            df = chat_object.dump_to_csv()
+            print('dumping cache', now)
 
-@bot.command(name='kekwho')
-async def kekwho(ctx):
-    await ctx.send('Hello there :) I am Kekbot. I transform Twitch emotes into shitty braille art. '
-                   'Type !kekhow and learn how to use me')
+    # DEFINE EVENTS
+    async def event_ready(self):
+        """"" Called once when the bot goes online """
+        asyncio.create_task(self.dump_cache())
+        for i in range(len(chat_object.channel_names)):
+            print(f"{os.environ['BOT_NICK']} is connected to {chat_object.channel_names[i]}")
 
+    async def event_message(self, message):
+        chat_object.twitchio_obj = message
+        chat_object.cache_log()
+        print(chat_object.log_content[-1])
+        await self.handle_commands(message)
 
-@bot.command(name='kekhow')
-async def kekhow(ctx):
-    """TODO: add personalized channel messages"""
-    await ctx.send('Redeem the reward, then type !kekthis or !kekthat followed by the emote or the emote link.'
-                   ' Look here for an example: https://github.com/RiccardoBarb/Kekbot')
+    # DEFINE COMMANDS
+    @commands.command(name='kekwho')
+    async def kekwho(self, ctx):
+        await ctx.send('Hello there :) I am Kekbot. I transform Twitch emotes into shitty braille art. '
+                       'Type !kekhow and learn how to use me')
 
+    @commands.command(name='kekhow')
+    async def kekhow(self, ctx):
+        """TODO: add personalized channel messages"""
+        await ctx.send('Redeem the reward, then type !kekthis or !kekthat followed by the emote or the emote link.'
+                       ' Look here for an example: https://github.com/RiccardoBarb/Kekbot')
 
-@bot.command(name='kekthis')
-async def kekthis(ctx):
-    """TODO: log requested emotes"""
-    chat_object.twitchio_obj = ctx
-    channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
-    if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
-        command_and_link = ctx.content
-        message_to_chat = kekfunc.handle_request(command_and_link)
-        await ctx.send(message_to_chat)
-    elif not chat_object.only_mods[channel_id]:
-        command_and_link = ctx.content
-        message_to_chat = kekfunc.handle_request(command_and_link)
-        await ctx.send(message_to_chat)
-    else:
-        pass
+    @commands.command(name='kekthis')
+    async def kekthis(self, ctx):
+        """TODO: log requested emotes"""
+        chat_object.twitchio_obj = ctx
+        channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
+        if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
+            command_and_link = ctx.content
+            message_to_chat = kekfunc.handle_request(command_and_link, self.emotes)
+            await ctx.send(message_to_chat)
+        elif not chat_object.only_mods[channel_id]:
+            command_and_link = ctx.content
+            message_to_chat = kekfunc.handle_request(command_and_link, self.emotes)
+            await ctx.send(message_to_chat)
+        else:
+            pass
 
+    @commands.command(name='kekthat')
+    async def kekthat(self, ctx):
+        chat_object.twitchio_obj = ctx
+        channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
+        if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
+            command_and_link = ctx.content
+            message_to_chat = kekfunc.handle_request(command_and_link, self.emotes)
+            await ctx.send(message_to_chat)
+        elif not chat_object.only_mods[channel_id]:
+            command_and_link = ctx.content
+            message_to_chat = kekfunc.handle_request(command_and_link, self.emotes)
+            await ctx.send(message_to_chat)
+        else:
+            pass
 
-@bot.command(name='kekthat')
-async def kekthat(ctx):
-    chat_object.twitchio_obj = ctx
-    channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
-    if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
-        command_and_link = ctx.content
-        message_to_chat = kekfunc.handle_request(command_and_link)
-        await ctx.send(message_to_chat)
-    elif not chat_object.only_mods[channel_id]:
-        command_and_link = ctx.content
-        message_to_chat = kekfunc.handle_request(command_and_link)
-        await ctx.send(message_to_chat)
-    else:
-        pass
+    @commands.command(name='test')
+    async def test(self, ctx):
+        chat_object.twitchio_obj = ctx
+        chat_object.to_dataframe()
+        channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
+        if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
+            await ctx.send('the author is a mod, do something')
+        elif not chat_object.only_mods[channel_id]:
+            await ctx.send('the author is not a mod, do something anyways')
+        else:
+            await ctx.send('only mods can do something')
 
-
-
-@bot.command(name='test')
-async def test(ctx):
-    chat_object.twitchio_obj = ctx
-    channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
-    if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
-        await ctx.send('the author is a mod, do something')
-    elif not chat_object.only_mods[channel_id]:
-        await ctx.send('the author is not a mod, do something anyways')
-    else:
-        await ctx.send('only mods can do something')
 
 # RUN THE BOT
-if __name__ == "__main__":
-    bot.run()
+
+bot = Bot()
+bot.run()
