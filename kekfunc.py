@@ -56,13 +56,13 @@ def build_pixel_matrix(img):
 
 
 def convert_to_braille(pixel_matrix, threshold, mode):
-    height = np.shape(pixel_matrix)[0]
-    width = np.shape(pixel_matrix)[1]
+    real_height = np.shape(pixel_matrix)[0]
+    real_width = np.shape(pixel_matrix)[1]
     converted_mat = []
     # this is where the conversion happens. We use a 2X4 pixels window to map a combination of 8 pixels to the
     # corresponding braille character
-    for pix_y in range(0, height, step_size_y):
-        for pix_x in range(0, width, step_size_x):
+    for pix_y in range(0, real_height, step_size_y):
+        for pix_x in range(0, real_width, step_size_x):
 
             current_window = pixel_matrix[pix_y:pix_y + step_size_y, pix_x:pix_x + step_size_x]
             if mode == 'pos':
