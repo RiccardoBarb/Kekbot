@@ -1,5 +1,6 @@
 import os
 from twitchio.ext import commands
+import asyncio
 import kekfunc
 import emote
 import chat
@@ -20,7 +21,16 @@ bot = commands.Bot(
 e = emote.Emote()
 e.load_recent_emotes()
 
-# DEFINE COMMANDS
+
+# DEFINE TASKS
+async def dump_cache():
+    while True:
+        df = chat_object.to_dataframe()
+        print('dumping cache')
+        await asyncio.sleep(1)
+
+
+# DEFINE EVENTS
 @bot.event
 async def event_ready():
     """"" Called once when the bot goes online """
@@ -28,6 +38,15 @@ async def event_ready():
         print(f"{os.environ['BOT_NICK']} is connected to {chat_object.channel_names[i]}")
 
 
+@bot.event
+async def event_message(message):
+    chat_object.twitchio_obj = message
+    chat_object.cache_log()
+    print(chat_object.log_content[-1])
+    await bot.handle_commands(message)
+
+
+# DEFINE COMMANDS
 @bot.command(name='kekwho')
 async def kekwho(ctx):
     await ctx.send('Hello there :) I am Kekbot. I transform Twitch emotes into shitty braille art. '
@@ -74,10 +93,10 @@ async def kekthat(ctx):
         pass
 
 
-
 @bot.command(name='test')
 async def test(ctx):
     chat_object.twitchio_obj = ctx
+    chat_object.to_dataframe()
     channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
     if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
         await ctx.send('the author is a mod, do something')
@@ -85,6 +104,7 @@ async def test(ctx):
         await ctx.send('the author is not a mod, do something anyways')
     else:
         await ctx.send('only mods can do something')
+
 
 # RUN THE BOT
 if __name__ == "__main__":
