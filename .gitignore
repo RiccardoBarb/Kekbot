@@ -2,4 +2,5 @@
 **/__pychache__
 *.pyc
 /utils/database/
-
+/Data/others
+Data/temp_data_log.csv
