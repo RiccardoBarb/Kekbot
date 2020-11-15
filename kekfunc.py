@@ -2,7 +2,7 @@ import urllib.request
 from PIL import Image, ImageOps, ImageFilter
 import numpy as np
 
-from matplotlib import pyplot as plt
+
 # unicode values of each dot in the 2X4 matrix for braille encoding
 # (https://github.com/asciimoo/drawille/blob/master/drawille.py)
 pixel_map = np.array([[0x01, 0x08], [0x02, 0x10], [0x04, 0x20], [0x40, 0x80]])
@@ -82,23 +82,37 @@ def convert_to_braille(pixel_matrix, threshold, mode):
 
 def handle_request(command_and_link, emotes):
     try:
-        requested_command = command_and_link[0:9]
-        image_reference = command_and_link[9::]
-        emotes.reference = image_reference
-        image_link = emotes.retrieve_emote()
-        req = urllib.request.Request(image_link, headers={'User-Agent': 'Mozilla/5.0'})
-        image = Image.open(urllib.request.urlopen(req))
-        pixel_matrix = build_pixel_matrix(image)
-        reshaped_mat = [chr(braille_char_offset) * width]
-        # positive gradient
-        if requested_command == '!kekthis ':
-            braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='pos')
-            for r in range(0, len(braille_matrix), width):
-                reshaped_mat.append("".join(braille_matrix[r:r + width]))
+        # if the request is triggered by a command
+        if ('!kek' in command_and_link) & (not emotes.is_url(command_and_link)):
+            requested_command = command_and_link[0:9]
+            image_reference = command_and_link[9::]
+            emotes.reference = image_reference
+            image_link = emotes.retrieve_emote()
+            req = urllib.request.Request(image_link, headers={'User-Agent': 'Mozilla/5.0'})
+            image = Image.open(urllib.request.urlopen(req))
+            pixel_matrix = build_pixel_matrix(image)
+            reshaped_mat = [chr(braille_char_offset) * width]
+            # positive gradient
+            if requested_command == '!kekthis ':
+                braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='pos')
+                for r in range(0, len(braille_matrix), width):
+                    reshaped_mat.append("".join(braille_matrix[r:r + width]))
 
-        # negative gradient
-        elif requested_command == '!kekthat ':
-            braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='neg')
+            # negative gradient
+            elif requested_command == '!kekthat ':
+                braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='neg')
+                for r in range(0, len(braille_matrix), width):
+                    reshaped_mat.append("".join(braille_matrix[r:r + width]))
+        else:
+            # if the request is triggered by a reward without a command we set positive gradient
+            image_reference = command_and_link
+            emotes.reference = image_reference
+            image_link = emotes.retrieve_emote()
+            req = urllib.request.Request(image_link, headers={'User-Agent': 'Mozilla/5.0'})
+            image = Image.open(urllib.request.urlopen(req))
+            pixel_matrix = build_pixel_matrix(image)
+            reshaped_mat = [chr(braille_char_offset) * width]
+            braille_matrix = convert_to_braille(pixel_matrix, threshold=145, mode='pos')
             for r in range(0, len(braille_matrix), width):
                 reshaped_mat.append("".join(braille_matrix[r:r + width]))
 
