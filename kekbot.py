@@ -5,11 +5,20 @@ import kekfunc
 import emote
 import chat
 from datetime import datetime
+import csv
+import pasta
+import numpy as np
 
 # GENERAL SETUP
 # load channel config and initialize chat object
 chat_config = chat.Chat.load_chat_config('utils/config.yaml')
 chat_object = chat.Chat(chat_config)
+# load pasta list
+with open('Data/copypasta/extended_fake_pastas.csv') as f:
+    reader = csv.reader(f)
+    pasta_list = list(reader)[0]
+pasta_id = np.asarray([i for i in range(len(pasta_list))])
+
 
 # set up the bot
 class Bot(commands.Bot):
@@ -24,6 +33,8 @@ class Bot(commands.Bot):
         # initialize emote and load emote list
         self.emotes = emote.Emote()
         self.emotes.load_recent_emotes()
+        self.pasta_list = pasta_list
+        self.pasta_id = pasta_id
 
     # DEFINE CYCLIC TASKS
     async def dump_cache(self):
@@ -36,15 +47,31 @@ class Bot(commands.Bot):
     # DEFINE EVENTS
     async def event_ready(self):
         """"" Called once when the bot goes online """
-        asyncio.create_task(self.dump_cache())
+        if chat_object.do_log:
+            asyncio.create_task(self.dump_cache())
+            print('logging')
+        else:
+            print('not logging')
+
         for i in range(len(chat_object.channel_names)):
             print(f"{os.environ['BOT_NICK']} is connected to {chat_object.channel_names[i]}")
 
     async def event_message(self, message):
-        chat_object.twitchio_obj = message
-        chat_object.cache_log()
-        print(chat_object.log_content[-1])
-        await self.handle_commands(message)
+        try:
+            if chat_object.do_log:
+                chat_object.twitchio_obj = message
+                chat_object.cache_log()
+                print(chat_object.log_content[-1])
+                await self.handle_commands(message)
+            elif 'custom-reward-id' in message.tags:
+                channel_id = chat_object.channel_names.index(message.channel.name)
+                if message.tags['custom-reward-id'] == chat_object.kekthis_reward[channel_id]:
+                    message_to_chat = kekfunc.handle_request(message.content, self.emotes)
+                    await message.channel.send(message_to_chat)
+            else:
+                await self.handle_commands(message)
+        except TypeError:
+            await self.handle_commands(message)
 
     # DEFINE COMMANDS
     @commands.command(name='kekwho')
@@ -54,9 +81,10 @@ class Bot(commands.Bot):
 
     @commands.command(name='kekhow')
     async def kekhow(self, ctx):
-        """TODO: add personalized channel messages"""
-        await ctx.send('Redeem the reward, then type !kekthis or !kekthat followed by the emote or the emote link.'
-                       ' Look here for an example: https://github.com/RiccardoBarb/Kekbot')
+        chat_object.twitchio_obj = ctx
+        channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
+        message = chat_object.kekhow_message[channel_id]
+        await ctx.send(message)
 
     @commands.command(name='kekthis')
     async def kekthis(self, ctx):
@@ -100,6 +128,21 @@ class Bot(commands.Bot):
             await ctx.send('the author is not a mod, do something anyways')
         else:
             await ctx.send('only mods can do something')
+
+    @commands.command(name='kekpasta')
+    async def kekpasta(self, ctx):
+        chat_object.twitchio_obj = ctx
+        channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
+        chosen_pasta, self.pasta_list, self.pasta_id = pasta.chose_pasta(self.pasta_list, self.pasta_id)
+        if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
+            print(str(len(self.pasta_list))+' remaining pastas')
+            await ctx.send(chosen_pasta)
+        elif not chat_object.only_mods[channel_id]:
+            print(str(len(self.pasta_list)) + ' remaining pastas')
+            await ctx.send(chosen_pasta)
+        else:
+            print(str(len(self.pasta_list)) + ' remaining pastas')
+            await ctx.send(chosen_pasta)
 
 
 # RUN THE BOT
