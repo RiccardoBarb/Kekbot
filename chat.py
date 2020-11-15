@@ -10,6 +10,9 @@ class Chat:
 
         self.channel_names = [eval(items['name']) for (channel, items) in chat_config.items()]
         self.only_mods = [items['only_mods'] for (channel, items) in chat_config.items()]
+        self.do_log = False
+        self.kekhow_message = [items['kekhow_message'] for (channel, items) in chat_config.items()]
+        self.kekthis_reward =[items['reward_code_kekthis'] for (channel, items) in chat_config.items()]
         self.twitchio_obj = twitchio_obj
         self.log_columns = ['author_id', 'author_name', 'is_mod', 'is_sub', 'is_turbo', 'message',
                             'channel', 'timestamp']
