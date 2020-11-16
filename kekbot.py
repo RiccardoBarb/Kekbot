@@ -14,10 +14,7 @@ import numpy as np
 chat_config = chat.Chat.load_chat_config('utils/config.yaml')
 chat_object = chat.Chat(chat_config)
 # load pasta list
-with open('Data/copypasta/extended_fake_pastas.csv') as f:
-    reader = csv.reader(f)
-    pasta_list = list(reader)[0]
-pasta_id = np.asarray([i for i in range(len(pasta_list))])
+pasta_list, pasta_id = pasta.load_pasta('Data/copypasta/extended_fake_pastas.csv')
 
 
 # set up the bot

@@ -1,4 +1,15 @@
 import numpy as np
+import csv
+
+
+def load_pasta(filepath):
+    with open(filepath) as f:
+        reader = csv.reader(f)
+        pasta_list = list(reader)[0]
+
+    pasta_id = np.asarray([i for i in range(len(pasta_list))])
+
+    return pasta_list, pasta_id
 
 
 def update_pasta(pasta_list, chosen_id):
