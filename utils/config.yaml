@@ -3,13 +3,16 @@ channel_1:
   only_mods: False
   kekhow_message: 'type !kekthis or !kekthat followed by an emote (or the corresponding url) to get the braille version of it!'
   reward_code_kekthis: 'Not Defined'
+  log_chat: False
 channel_2:
   name: os.environ['CHANNEL_2']
   only_mods: True
   kekhow_message: 'Redeem the reward, then write a BTTV or Twitch emote (or the corresponding url) to get the braille version of it!'
   reward_code_kekthis: '8144fb71-f29d-4d09-9ae5-0f908d5b4a78'
+  log_chat: False
 chennel_3:
   name: os.environ['CHANNEL_3']
   only_mods: True
   kekhow_message: ''
   reward_code_kekthis: 'Not Defined'
+  log_chat: False

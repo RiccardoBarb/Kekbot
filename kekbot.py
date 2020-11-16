@@ -44,7 +44,7 @@ class Bot(commands.Bot):
     # DEFINE EVENTS
     async def event_ready(self):
         """"" Called once when the bot goes online """
-        if chat_object.do_log:
+        if chat_object.dump_log:
             asyncio.create_task(self.dump_cache())
             print('logging')
         else:
@@ -55,18 +55,22 @@ class Bot(commands.Bot):
 
     async def event_message(self, message):
         try:
-            if chat_object.do_log:
+            channel_id = chat_object.channel_names.index(message.channel.name)
+            # channel specific cached logs
+            if chat_object.log_chat[channel_id]:
                 chat_object.twitchio_obj = message
                 chat_object.cache_log()
                 print(chat_object.log_content[-1])
                 await self.handle_commands(message)
-            elif 'custom-reward-id' in message.tags:
-                channel_id = chat_object.channel_names.index(message.channel.name)
+
+            if 'custom-reward-id' in message.tags:
+
                 if message.tags['custom-reward-id'] == chat_object.kekthis_reward[channel_id]:
                     message_to_chat = kekfunc.handle_request(message.content, self.emotes)
                     await message.channel.send(message_to_chat)
             else:
                 await self.handle_commands(message)
+
         except TypeError:
             await self.handle_commands(message)
 

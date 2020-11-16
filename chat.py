@@ -6,11 +6,12 @@ import pandas as pd
 class Chat:
     def __init__(self, chat_config, twitchio_obj=None):
         """chat_config: is a dictionary specifying the channel names and channel-specific settings
-        twitchio_obj: is the twitchio object containing the log of chat events."""
+        twitchio_obj: is the twitchio object containing relevant information on chat events."""
 
         self.channel_names = [eval(items['name']) for (channel, items) in chat_config.items()]
         self.only_mods = [items['only_mods'] for (channel, items) in chat_config.items()]
-        self.do_log = False
+        self.dump_log = False
+        self.log_chat = [items['log_chat'] for (channel, items) in chat_config.items()]
         self.kekhow_message = [items['kekhow_message'] for (channel, items) in chat_config.items()]
         self.kekthis_reward =[items['reward_code_kekthis'] for (channel, items) in chat_config.items()]
         self.twitchio_obj = twitchio_obj
