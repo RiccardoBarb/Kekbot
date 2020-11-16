@@ -15,7 +15,10 @@ chat_config = chat.Chat.load_chat_config('utils/config.yaml')
 chat_object = chat.Chat(chat_config)
 # load pasta list
 pasta_list, pasta_id = pasta.load_pasta('Data/copypasta/extended_fake_pastas.csv')
-
+# COLORS FOR TERMINAL
+print_color_green = '\033[92m'
+print_color_cyan = '\u001b[36;1m'
+print_color_reset = '\u001b[0m'
 
 # set up the bot
 class Bot(commands.Bot):
@@ -46,12 +49,14 @@ class Bot(commands.Bot):
         """"" Called once when the bot goes online """
         if chat_object.dump_log:
             asyncio.create_task(self.dump_cache())
-            print('logging')
+            print(f"{print_color_green} dumping logs in Data/temp_data_log.csv every 120s {print_color_reset}")
         else:
-            print('not logging')
+            print(f"{print_color_cyan} not dumping logs {print_color_reset}")
 
         for i in range(len(chat_object.channel_names)):
             print(f"{os.environ['BOT_NICK']} is connected to {chat_object.channel_names[i]}")
+            if chat_object.log_chat[i]:
+                print(f"{print_color_green} logging chat for {chat_object.channel_names[i]}{print_color_reset}")
 
     async def event_message(self, message):
         try:
