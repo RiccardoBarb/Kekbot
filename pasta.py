@@ -8,6 +8,7 @@ def load_pasta(filepath):
         pasta_list = list(reader)[0]
 
     pasta_id = np.asarray([i for i in range(len(pasta_list))])
+    print('Fake pasta loaded successfully!')
 
     return pasta_list, pasta_id
 
