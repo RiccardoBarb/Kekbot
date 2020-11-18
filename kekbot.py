@@ -18,6 +18,7 @@ pasta_list, pasta_id = pasta.load_pasta('Data/copypasta/extended_fake_pastas.csv
 # COLORS FOR TERMINAL
 print_color_green = '\033[92m'
 print_color_cyan = '\u001b[36;1m'
+print_color_red = '\u001b[31m'
 print_color_reset = '\u001b[0m'
 
 # set up the bot
@@ -33,6 +34,7 @@ class Bot(commands.Bot):
         # initialize emote and load emote list
         self.emotes = emote.Emote()
         self.emotes.load_recent_emotes()
+        # initialize fake pasta
         self.pasta_list = pasta_list
         self.pasta_id = pasta_id
 
@@ -106,6 +108,7 @@ class Bot(commands.Bot):
             message_to_chat = kekfunc.handle_request(command_and_link, self.emotes)
             await ctx.send(message_to_chat)
         else:
+            print(f"{print_color_red} kekthis not triggered by a mod {print_color_reset}")
             pass
 
     @commands.command(name='kekthat')
@@ -121,6 +124,7 @@ class Bot(commands.Bot):
             message_to_chat = kekfunc.handle_request(command_and_link, self.emotes)
             await ctx.send(message_to_chat)
         else:
+            print(f"{print_color_red} kekthat not triggered by a mod {print_color_reset}")
             pass
 
     @commands.command(name='test')
@@ -139,16 +143,17 @@ class Bot(commands.Bot):
     async def kekpasta(self, ctx):
         chat_object.twitchio_obj = ctx
         channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
-        chosen_pasta, self.pasta_list, self.pasta_id = pasta.chose_pasta(self.pasta_list, self.pasta_id)
         if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
+            chosen_pasta, self.pasta_list, self.pasta_id = pasta.chose_pasta(self.pasta_list, self.pasta_id)
             print(str(len(self.pasta_list))+' remaining pastas')
             await ctx.send(chosen_pasta)
         elif not chat_object.only_mods[channel_id]:
+            chosen_pasta, self.pasta_list, self.pasta_id = pasta.chose_pasta(self.pasta_list, self.pasta_id)
             print(str(len(self.pasta_list)) + ' remaining pastas')
             await ctx.send(chosen_pasta)
         else:
-            print(str(len(self.pasta_list)) + ' remaining pastas')
-            await ctx.send(chosen_pasta)
+            print(f"{print_color_red} kekpasta not triggered by a mod {print_color_reset}")
+            pass
 
 
 # RUN THE BOT
