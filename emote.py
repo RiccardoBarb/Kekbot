@@ -51,6 +51,23 @@ class Emote:
                 ids = emote['id']
                 emotes_list[code] = ids
 
+    def get_global_bttv_emotes(self):
+
+        emotes_list = self.emotes_list
+        url = 'https://api.betterttv.net/3/cached/emotes/global'
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        url_content = urllib.request.urlopen(req)
+        url_data = url_content.read()
+        encoding = url_content.info().get_content_charset('utf-8')
+        json_content = json.loads(url_data.decode(encoding))
+
+        for i in range(0, len(json_content)):
+            emote = json_content[i]
+            code = emote['code']
+            if code not in emotes_list:
+                ids = emote['id']
+                emotes_list[code] = ids
+
     def get_twitch_emotes(self, set_number):
 
         """set_number needs to be a an integer between 0 and 5 for standard emotes"""
