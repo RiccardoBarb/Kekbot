@@ -10,7 +10,7 @@ class Chat:
 
         self.channel_names = [eval(items['name']) for (channel, items) in chat_config.items()]
         self.only_mods = [items['only_mods'] for (channel, items) in chat_config.items()]
-        self.dump_log = False
+        self.dump_log = True
         self.log_chat = [items['log_chat'] for (channel, items) in chat_config.items()]
         self.kekhow_message = [items['kekhow_message'] for (channel, items) in chat_config.items()]
         self.kekthis_reward =[items['reward_code_kekthis'] for (channel, items) in chat_config.items()]
