@@ -9,12 +9,13 @@ import csv
 import pasta
 import numpy as np
 
+# TODO: kekchatter
 # GENERAL SETUP
 # load channel config and initialize chat object
 chat_config = chat.Chat.load_chat_config('utils/config.yaml')
 chat_object = chat.Chat(chat_config)
 # load pasta list
-pasta_list, pasta_id = pasta.load_pasta('Data/copypasta/extended_fake_pastas.csv')
+pasta_list, pasta_id = pasta.load_pasta('Data/copypasta/deep_fake_pasta.csv')
 # COLORS FOR TERMINAL
 print_color_green = '\033[92m'
 print_color_cyan = '\u001b[36;1m'
@@ -44,7 +45,7 @@ class Bot(commands.Bot):
             await asyncio.sleep(120)
             now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             df = chat_object.dump_to_csv()
-            print('dumping cache', now)
+            print(f"{print_color_cyan} dumping cache {print_color_reset}", now)
 
     # DEFINE EVENTS
     async def event_ready(self):
@@ -127,10 +128,10 @@ class Bot(commands.Bot):
             print(f"{print_color_red} kekthat not triggered by a mod {print_color_reset}")
             pass
 
-    @commands.command(name='test')
-    async def test(self, ctx):
+    @commands.command(name='kektest')
+    async def kektest(self, ctx):
         chat_object.twitchio_obj = ctx
-        chat_object.to_dataframe()
+        #chat_object.to_dataframe()
         channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
         if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
             await ctx.send('the author is a mod, do something')
