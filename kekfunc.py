@@ -119,4 +119,5 @@ def handle_request(command_and_link, emotes):
         return "\n".join(reshaped_mat)
 
     except Exception:
-        return "".join("MrDestructoid Something went wrong MrDestructoid, cannot process that")
+        return "".join("MrDestructoid Something went wrong MrDestructoid, cannot process that. To get channel-specific "
+                       "emotes use the command !kekmore + streamer name (only works if the stream is live)")
