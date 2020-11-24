@@ -169,6 +169,7 @@ class Bot(commands.Bot):
 
             if tot > 0:
                 message = 'collected a total of ' + str(tot) + ' emotes from ' + ch
+                self.emotes.save_emotes()
             else:
                 message = 'there were no new emotes to collect from ' + ch
 
