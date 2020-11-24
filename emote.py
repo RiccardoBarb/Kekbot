@@ -70,7 +70,8 @@ class Emote:
 
     def get_twitch_emotes(self, set_number):
 
-        """set_number needs to be a an integer between 0 and 5 for standard emotes"""
+        """set_number needs to be a an integer between 0 and 5 for standard emotes
+           input channel_id, which corresponds to the broadcaster id for channel-specific emotes"""
 
         emotes_list = self.emotes_list
         url = 'https://api.twitchemotes.com/api/v4/channels/' + str(set_number)
@@ -79,13 +80,17 @@ class Emote:
         url_data = url_content.read()
         encoding = url_content.info().get_content_charset('utf-8')
         json_content = json.loads(url_data.decode(encoding))
-
+        tot = 0
         for i in range(0, len(json_content['emotes'])):
             emote = json_content['emotes'][i]
             code = emote['code']
             if code not in emotes_list:
                 ids = emote['id']
                 emotes_list[code] = ids
+                tot += 1
+        if tot > 0:
+            print('collected a total of ' + str(tot) + ' emotes')
+        return tot
 
     def save_emotes(self):
         wd = os.getcwd()

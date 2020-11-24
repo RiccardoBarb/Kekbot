@@ -9,7 +9,6 @@ import csv
 import pasta
 import numpy as np
 
-# TODO: kekchatter
 # GENERAL SETUP
 # load channel config and initialize chat object
 chat_config = chat.Chat.load_chat_config('utils/config.yaml')
@@ -22,6 +21,7 @@ print_color_cyan = '\u001b[36;1m'
 print_color_red = '\u001b[31m'
 print_color_reset = '\u001b[0m'
 
+
 # set up the bot
 class Bot(commands.Bot):
 
@@ -29,6 +29,7 @@ class Bot(commands.Bot):
         super().__init__(
             irc_token=os.environ['TMI_TOKEN'],
             client_id=os.environ['CLIENT_ID'],
+            client_secret='du3kk0yib7wp3m4nioxf3kvhorkxan',
             nick=os.environ['BOT_NICK'],
             prefix=os.environ['BOT_PREFIX'],
             initial_channels=chat_object.channel_names)
@@ -44,12 +45,12 @@ class Bot(commands.Bot):
         while True:
             await asyncio.sleep(120)
             now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            df = chat_object.dump_to_csv()
+            chat_object.dump_to_csv()
             print(f"{print_color_cyan} dumping cache {print_color_reset}", now)
 
     # DEFINE EVENTS
     async def event_ready(self):
-        """"" Called once when the bot goes online """
+        """" Called once when the bot goes online"""
         if chat_object.dump_log:
             asyncio.create_task(self.dump_cache())
             print(f"{print_color_green} dumping logs in Data/temp_data_log.csv every 120s {print_color_reset}")
@@ -131,7 +132,7 @@ class Bot(commands.Bot):
     @commands.command(name='kektest')
     async def kektest(self, ctx):
         chat_object.twitchio_obj = ctx
-        #chat_object.to_dataframe()
+        # chat_object.to_dataframe()
         channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
         if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
             await ctx.send('the author is a mod, do something')
@@ -146,7 +147,7 @@ class Bot(commands.Bot):
         channel_id = chat_object.channel_names.index(chat_object.twitchio_obj.channel.name)
         if chat_object.only_mods[channel_id] and chat_object.twitchio_obj.author.is_mod:
             chosen_pasta, self.pasta_list, self.pasta_id = pasta.chose_pasta(self.pasta_list, self.pasta_id)
-            print(str(len(self.pasta_list))+' remaining pastas')
+            print(str(len(self.pasta_list)) + ' remaining pastas')
             await ctx.send(chosen_pasta)
         elif not chat_object.only_mods[channel_id]:
             chosen_pasta, self.pasta_list, self.pasta_id = pasta.chose_pasta(self.pasta_list, self.pasta_id)
@@ -155,6 +156,27 @@ class Bot(commands.Bot):
         else:
             print(f"{print_color_red} kekpasta not triggered by a mod {print_color_reset}")
             pass
+
+    @commands.command(name='kekmore')
+    async def kekmore(self, ctx):
+        chat_object.twitchio_obj = ctx
+        ch = ctx.content[9:]
+        s = await self.get_stream(channel=ch)
+        if s:
+            room_id = s['user_id']
+            print(f'collecting emotes from {ch}')
+            tot = self.emotes.get_twitch_emotes(room_id)
+
+            if tot > 0:
+                message = 'collected a total of ' + str(tot) + ' emotes from ' + ch
+            else:
+                message = 'there were no new emotes to collect from ' + ch
+
+            await ctx.send(message)
+
+        else:
+            message = ch + ' stream is currently offline, try again later'
+            await ctx.send(message)
 
 
 # RUN THE BOT
