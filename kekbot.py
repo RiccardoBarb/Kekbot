@@ -29,7 +29,7 @@ class Bot(commands.Bot):
         super().__init__(
             irc_token=os.environ['TMI_TOKEN'],
             client_id=os.environ['CLIENT_ID'],
-            client_secret='du3kk0yib7wp3m4nioxf3kvhorkxan',
+            client_secret=os.environ['CLIENT_SECRET'],
             nick=os.environ['BOT_NICK'],
             prefix=os.environ['BOT_PREFIX'],
             initial_channels=chat_object.channel_names)
