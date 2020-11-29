@@ -7,7 +7,7 @@ channel_1:
 channel_2:
   name: os.environ['CHANNEL_2']
   only_mods: False
-  kekhow_message: 'Redeem the reward, then write a BTTV or Twitch emote (or the corresponding url) to get the braille version of it!'
+  kekhow_message: 'redeem the reward and type the emote name to get the braille version of it! damide1Hi. You can add channel specific emotes with !kekmore + channel name'
   reward_code_kekthis: '8144fb71-f29d-4d09-9ae5-0f908d5b4a78'
   log_chat: False
 chennel_3:
@@ -16,15 +16,15 @@ chennel_3:
   kekhow_message: ''
   reward_code_kekthis: 'Not Defined'
   log_chat: False
-chennel_4:
-  name: os.environ['CHANNEL_4']
-  only_mods: True
-  kekhow_message: ''
-  reward_code_kekthis: 'Not Defined'
-  log_chat: False
-chennel_5:
-  name: os.environ['CHANNEL_5']
-  only_mods: True
-  kekhow_message: ''
-  reward_code_kekthis: 'Not Defined'
-  log_chat: False
+#chennel_4:
+#  name: os.environ['CHANNEL_4']
+#  only_mods: True
+#  kekhow_message: ''
+#  reward_code_kekthis: 'Not Defined'
+#  log_chat: False
+#chennel_5:
+#  name: os.environ['CHANNEL_5']
+#  only_mods: True
+#  kekhow_message: ''
+#  reward_code_kekthis: 'Not Defined'
+#  log_chat: False
