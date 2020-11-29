@@ -7,7 +7,7 @@ Kebot also likes memes and it can produce AI generated copypastas. They are rare
 
 Kekbot knows the most common Twitch and BTTV emotes. It can access to the emote if you use the **!kekthis** or the **!kekthat** command followed by the emote name (<ins>emote names are case sensitive!</ins>). 
 With this method you can spam the braille version of more than 8000 different emotes! However not all of the emotes are available (for now).<br/>
-Channel-specific emotes like damide1Hi are not available at the moment. However, you can directly use the url of a specific picture with **!kekthis** or **!kekthat**. In this way you can literally transform any picture into braille, PogChamp!<br/>
+Channel-specific emotes like damide1Hi are potentially availabl, but they need to be added to Kekbot database (see **!kekmore**). You can even directly use the url of a specific picture with **!kekthis** or **!kekthat**. In this way you can literally transform any picture into braille, PogChamp!<br/>
 * *N.B.1*: The emote names are case sensitive! **!kekthis** poggers will return an error, but **!kekthis** POGGERS will work.<br/>
 * *N.B.2*: Some of the picture-to-braille transformations sucks (have you tried with BibleThump?). 
 
@@ -29,6 +29,7 @@ To spam one of the "fake" copypastas in chat just type **!kekpasta**.
 
 * **!kekthis** + emote name (case sensitive!) **or** image url: it converts the pixels with high luminance into braille characters and types the result in chat.
 * **!kekthat** + emote name (case sensitive!) **or** image url: it works like **!kekthis** but only pixels with low luminance will be converted into braille. 
+* **!kekmore** + twitch channel name. This command add the emotes of a specific channel to the [emote database](https://github.com/RiccardoBarb/Kekbot/blob/master/Data/). The command works only if the stream on the selected channel is currently online. But once downloaded, the emotes will be permanently stored.
 * **!kekwho**: Kekbot describes itself and encourage the use of **!kekhow**
 * **!kekhow**: Kekbot returns channel-specific messages.
 * **!kekpasta**: Kekbot spam an [AI generated copypasta](https://github.com/RiccardoBarb/Kekbot/blob/master/Data/copypasta/deep_fake_pasta.csv)
